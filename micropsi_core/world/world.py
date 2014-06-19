@@ -344,3 +344,8 @@ try:
     from micropsi_core.world.minecraft.minecraft import Minecraft
 except ImportError as e:
     sys.stdout.write("Could not import minecraft world.\nError: %s \n\n" % e.msg)
+
+try:
+    from micropsi_core.world.island_thesis import island_thesis
+except ImportError as e:
+    sys.stdout.write("Could not import island thesis world.\nError: %s \n\n" % e.msg)
