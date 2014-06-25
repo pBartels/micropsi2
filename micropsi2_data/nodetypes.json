@@ -1,0 +1,9 @@
+{
+    "Mapping": {
+        "name": "NativeTest",
+        "slottypes": ["moved", "pos_x", "pos_y", "ground"],
+        "nodefunction_name": "mapping",
+        "gatetypes": [],
+        "gate_defaults": {}
+    }
+}
