@@ -1,5 +1,5 @@
 from micropsi_core.world.island.island import *
-import random
+import random, collections
 
 class ThesisIsland(Island, World):
     def __init__(self, filename, world_type="ThesisIsland", name="", owner="", uid=None, version=1):
@@ -18,8 +18,8 @@ class ThesisIsland(Island, World):
 
 
 class ThesisAgent(WorldAdapter):
-    datasources = {'moved': 0, 'pos_x': 0, 'pos_y': 0, 'ground': 0}
-    datatargets = {'loco_north': 0, 'loco_south': 0, 'loco_east': 0, 'loco_west': 0}
+    datasources = {'moved': 0, 'pos_x': 0, 'pos_y': 0, 'ground': 0, 'motive': 0}
+    datatargets = {'pos_x': 0, 'pos_y': 0}
     last_position = None
     known_positions = []
 
@@ -36,9 +36,16 @@ class ThesisAgent(WorldAdapter):
             self.position = self.world.groundmap['start_position']
             self.last_position = self.position
             self.known_positions.append(self.last_position)
+
+            self.datatargets['pos_x'] = 0
+            self.datatargets['pos_y'] = 0
+            self.set_datatarget_feedback('pos_x', 0)
+            self.set_datatarget_feedback('pos_y', 0)
+
             self.datasources['pos_x'] = self.position[0]
             self.datasources['pos_y'] = self.position[1]
             self.datasources['ground'] = self.perceive_ground()
+            self.select_motive() # also sets datasource
 
     def perceive_ground(self):
         return self.world.get_ground_at(self.position[0], self.position[1])
@@ -46,12 +53,23 @@ class ThesisAgent(WorldAdapter):
     def update(self):
         """called on every world simulation step to advance the life of the agent"""
 
-        # a very simple random movement to check how a position update cycle works
-        random.seed(os.urandom(32))
-        newpos = (self.position[0]+random.randint(-5, 5), self.position[1]+random.randint(-5, 20))
+        target_pos_x = int(self.datatargets['pos_x'])
+        target_pos_y = int(self.datatargets['pos_y'])
+        self.set_datatarget_feedback('pos_x', target_pos_x)
+        self.set_datatarget_feedback('pos_y', target_pos_y)
+
+        # TODO: improve movement behavior
+        if not target_pos_x and not target_pos_y:
+            # a very simple random movement to check how a position update cycle works
+            random.seed(os.urandom(32))
+            newpos = (self.position[0]+random.randint(-5, 5), self.position[1]+random.randint(-5, 20))
+        else:
+            # locomote to desired position
+            newpos = (target_pos_x, target_pos_y)
 
         # use water as a border and respect motives
-        if self.world.get_ground_at(newpos[0], newpos[1]) != 7 and self.select_motive() == 'exploration' or self.select_motive() == 'energy':
+        motive = self.select_motive()
+        if self.world.get_ground_at(newpos[0], newpos[1]) != 7 and motive == 'exploration' or motive == 'energy':
             self.known_positions.append(self.last_position)
             self.last_position = self.position
             self.position = newpos
@@ -93,11 +111,13 @@ class ThesisAgent(WorldAdapter):
 
     def select_motive(self):
         # it might be useful to put everything in a dict in general?
-        tanks = {'energy': self.energy,
-                 'healthiness': self.healthiness,
-                 'exploration': self.exploration,
-        }
-        return min(tanks, key=tanks.get)
+        tanks = collections.OrderedDict([('energy', self.energy),
+            ('healthiness', self.healthiness),
+            ('exploration', self.exploration),
+        ])
+        motive = min(tanks, key=tanks.get)
+        self.datasources['motive'] = list(tanks.keys()).index(motive)
+        return motive
 
     def observe(self):
         print('Ground:', ground_types[self.perceive_ground()]['type'])

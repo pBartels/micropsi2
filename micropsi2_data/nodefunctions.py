@@ -1,7 +1,88 @@
 __author__ = 'pBartels'
-__date__ = '20.06.14'
+__date__ = '26.06.14'
 
-import re
+import re, math
+
+
+def path_planning(netapi, node=None, sheaf='default', **params):
+
+    def determine_nearest_waypoint(node, pos_x, pos_y):
+        # get the connected paths to this ground marker
+        sur_paths = [link.target_node for link in node.get_gate('sur').outgoing.values()]
+
+        # traverse path and determine nearest waypoint
+        nearest_waypoint = None
+        nearest_waypoint_distance = None
+        for w in sur_paths:
+            cur_waypoint = w
+
+            while cur_waypoint:
+                match = list(map(int, re.findall(r'\d+', cur_waypoint.name)))
+                distance = math.sqrt((pos_x - match[0]) ** 2 + (pos_y - match[1]) ** 2)
+
+                if distance < 10:
+                    # already next to nearest waypoint, now follow path (in 'por' direction)
+                    next_waypoints = [link.target_node for link in cur_waypoint.get_gate('por').outgoing.values()]
+                    if next_waypoints:
+                        return next_waypoints[0]
+
+                if nearest_waypoint_distance == None or distance < nearest_waypoint_distance:
+                    nearest_waypoint = cur_waypoint
+                    nearest_waypoint_distance = distance
+
+                # get next waypoint in path
+                next_waypoints = [link.target_node for link in cur_waypoint.get_gate('ret').outgoing.values()]
+                if next_waypoints:
+                    cur_waypoint = next_waypoints[0]
+                else:
+                    break # reached end of path
+
+        return nearest_waypoint
+
+
+    # note: the gates of the sensors must be properly parameterized (the maximum must not be 1)
+    pos_x = int(node.get_slot('pos_x').get_activation())
+    pos_y = int(node.get_slot('pos_y').get_activation())
+    motive = int(node.get_slot('motive').get_activation())
+
+
+    # check if a dedicated nodespace already exists and use this or abort
+    path_nodespace = None
+    for n in netapi.nodespaces.values():
+        if n.name == 'mapping':
+            path_nodespace = n
+            break
+
+    if not path_nodespace:
+        return
+
+
+    # pepare a dict of all nodes in the path nodespace
+    nodes = {n.name:n for n in netapi.get_nodes(path_nodespace.uid)}
+
+
+    # TODO: there might be better solutions to encode motives?
+    # motive encoding:
+    # 0. 'energy'
+    # 1. 'healthiness'
+    # 2. 'exploration'
+
+    # determine nearest waypoint in all paths to area that fulfills demand
+    if motive == 0: # 0. 'energy'
+        marker_node = nodes['ground_darkgrass']
+    elif motive == 1: # 1. 'healthiness'
+        marker_node = nodes['ground_grass']
+    elif motive == 2: # 2. 'exploration'
+        return # nothing to do if motive is exploration
+
+    nearest_waypoint = determine_nearest_waypoint(marker_node, pos_x, pos_y)
+    if nearest_waypoint:
+        match = list(map(int, re.findall(r'\d+', nearest_waypoint.name)))
+        # set activation on gates to enable locomotion
+        node.get_gate("pos_x").gate_function(match[0])
+        node.get_gate("pos_y").gate_function(match[1])
+
+    # TODO: do not perform this over and over again...
 
 
 def mapping(netapi, node=None, sheaf='default', **params):

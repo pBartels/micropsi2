@@ -1,9 +1,27 @@
 {
     "Mapping": {
-        "name": "NativeTest",
+        "name": "Mapping",
         "slottypes": ["moved", "pos_x", "pos_y", "ground"],
         "nodefunction_name": "mapping",
         "gatetypes": [],
         "gate_defaults": {}
+    },
+    "PathPlanning": {
+        "name": "PathPlanning",
+        "slottypes": ["pos_x", "pos_y", "motive"],
+        "nodefunction_name": "path_planning",
+        "gatetypes": ["pos_x", "pos_y"],
+        "gate_defaults": {
+            "pos_x": {
+                "minimum": 0,
+                "maximum": 2048,
+                "threshold": -100
+            },
+            "pos_y": {
+                "minimum": 0,
+                "maximum": 2048,
+                "threshold": -100
+            }
+        }
     }
 }
