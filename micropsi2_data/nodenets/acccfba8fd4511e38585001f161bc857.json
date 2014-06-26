@@ -1,0 +1,405 @@
+{
+    "links": {
+        "016fc9d9-b75b-4cfe-bf87-5f9c995df420": {
+            "certainty": 1, 
+            "source_gate_name": "gen", 
+            "source_node_uid": "c8d1a0e0-c0b5-4c33-b2c0-88b6461892b2", 
+            "target_node_uid": "e7052e99-7e68-41fb-8788-76060a8ce0d0", 
+            "target_slot_name": "pos_y", 
+            "uid": "016fc9d9-b75b-4cfe-bf87-5f9c995df420", 
+            "weight": 1
+        }, 
+        "18bdcbd6-8e4c-4f54-b776-68ebc2ebb407": {
+            "certainty": 1, 
+            "source_gate_name": "pos_y", 
+            "source_node_uid": "e7052e99-7e68-41fb-8788-76060a8ce0d0", 
+            "target_node_uid": "1b7d4237-6706-45cb-963a-6f250ef3b957", 
+            "target_slot_name": "gen", 
+            "uid": "18bdcbd6-8e4c-4f54-b776-68ebc2ebb407", 
+            "weight": 1
+        }, 
+        "2d0b8523-4d45-4ddf-9f7f-39921fee1a1f": {
+            "certainty": 1, 
+            "source_gate_name": "gen", 
+            "source_node_uid": "c1a09b9c-83bd-45b7-83a6-5c223bdef555", 
+            "target_node_uid": "e7052e99-7e68-41fb-8788-76060a8ce0d0", 
+            "target_slot_name": "pos_x", 
+            "uid": "2d0b8523-4d45-4ddf-9f7f-39921fee1a1f", 
+            "weight": 1
+        }, 
+        "57331ee0-a6b2-4c15-8549-6a12226b5984": {
+            "certainty": 1, 
+            "source_gate_name": "gen", 
+            "source_node_uid": "c5453050-6e24-438f-92c7-f92b06af6f3b", 
+            "target_node_uid": "a38ccb30-b68d-4e28-a88c-5d948bd55970", 
+            "target_slot_name": "ground", 
+            "uid": "57331ee0-a6b2-4c15-8549-6a12226b5984", 
+            "weight": 1
+        }, 
+        "57e137ce-dc29-43ed-af15-16da02dd4efb": {
+            "certainty": 1, 
+            "source_gate_name": "gen", 
+            "source_node_uid": "dc27e922-675a-48f2-ab83-60b7f1565f40", 
+            "target_node_uid": "e7052e99-7e68-41fb-8788-76060a8ce0d0", 
+            "target_slot_name": "motive", 
+            "uid": "57e137ce-dc29-43ed-af15-16da02dd4efb", 
+            "weight": 1
+        }, 
+        "97843469-a3ce-4476-a87e-b17fcc98d2c4": {
+            "certainty": 1, 
+            "source_gate_name": "gen", 
+            "source_node_uid": "c8d1a0e0-c0b5-4c33-b2c0-88b6461892b2", 
+            "target_node_uid": "a38ccb30-b68d-4e28-a88c-5d948bd55970", 
+            "target_slot_name": "pos_y", 
+            "uid": "97843469-a3ce-4476-a87e-b17fcc98d2c4", 
+            "weight": 1
+        }, 
+        "b8f4f996-5cba-48d2-82f1-aa469ce005a4": {
+            "certainty": 1, 
+            "source_gate_name": "gen", 
+            "source_node_uid": "f08a96f4-e0ae-48f4-8b5e-91ce9d52d8d5", 
+            "target_node_uid": "a38ccb30-b68d-4e28-a88c-5d948bd55970", 
+            "target_slot_name": "moved", 
+            "uid": "b8f4f996-5cba-48d2-82f1-aa469ce005a4", 
+            "weight": 1
+        }, 
+        "be1bcab1-19c1-457b-baca-c0a3a3ac4603": {
+            "certainty": 1, 
+            "source_gate_name": "gen", 
+            "source_node_uid": "c1a09b9c-83bd-45b7-83a6-5c223bdef555", 
+            "target_node_uid": "a38ccb30-b68d-4e28-a88c-5d948bd55970", 
+            "target_slot_name": "pos_x", 
+            "uid": "be1bcab1-19c1-457b-baca-c0a3a3ac4603", 
+            "weight": 1
+        }, 
+        "e8a0f9a9-b31d-4c86-ad32-c0d9eddf6dbe": {
+            "certainty": 1, 
+            "source_gate_name": "pos_x", 
+            "source_node_uid": "e7052e99-7e68-41fb-8788-76060a8ce0d0", 
+            "target_node_uid": "8f46071f-7649-481a-94a3-580a5ceb4208", 
+            "target_slot_name": "gen", 
+            "uid": "e8a0f9a9-b31d-4c86-ad32-c0d9eddf6dbe", 
+            "weight": 1
+        }
+    }, 
+    "name": "Thesis NodeNet", 
+    "nodes": {
+        "1b7d4237-6706-45cb-963a-6f250ef3b957": {
+            "gate_activations": {
+                "gen": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "gen": {
+                    "amplification": 1, 
+                    "certainty": 1, 
+                    "decay": 0, 
+                    "maximum": 1, 
+                    "minimum": -1, 
+                    "spreadsheaves": false, 
+                    "threshold": 0
+                }
+            }, 
+            "index": 10, 
+            "name": "", 
+            "parameters": {
+                "datatarget": "pos_y"
+            }, 
+            "parent_nodespace": "Root", 
+            "position": [
+                986.25, 
+                182.5
+            ], 
+            "type": "Actor", 
+            "uid": "1b7d4237-6706-45cb-963a-6f250ef3b957"
+        }, 
+        "8f46071f-7649-481a-94a3-580a5ceb4208": {
+            "gate_activations": {
+                "gen": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "gen": {
+                    "amplification": 1, 
+                    "certainty": 1, 
+                    "decay": 0, 
+                    "maximum": 1, 
+                    "minimum": -1, 
+                    "spreadsheaves": false, 
+                    "threshold": 0
+                }
+            }, 
+            "index": 9, 
+            "name": "", 
+            "parameters": {
+                "datatarget": "pos_x"
+            }, 
+            "parent_nodespace": "Root", 
+            "position": [
+                985, 
+                91.25
+            ], 
+            "type": "Actor", 
+            "uid": "8f46071f-7649-481a-94a3-580a5ceb4208"
+        }, 
+        "a38ccb30-b68d-4e28-a88c-5d948bd55970": {
+            "gate_parameters": {}, 
+            "index": 6, 
+            "name": "", 
+            "parameters": {}, 
+            "parent_nodespace": "Root", 
+            "position": [
+                135.0, 
+                135.0
+            ], 
+            "type": "Mapping", 
+            "uid": "a38ccb30-b68d-4e28-a88c-5d948bd55970"
+        }, 
+        "c1a09b9c-83bd-45b7-83a6-5c223bdef555": {
+            "gate_activations": {
+                "gen": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "gen": {
+                    "amplification": 1.0, 
+                    "certainty": 1.0, 
+                    "decay": 0.0, 
+                    "maximum": 2048.0, 
+                    "minimum": -1.0, 
+                    "spreadsheaves": 0.0, 
+                    "threshold": 0.0
+                }
+            }, 
+            "index": 5, 
+            "name": "", 
+            "parameters": {
+                "datasource": "pos_x"
+            }, 
+            "parent_nodespace": "Root", 
+            "position": [
+                640, 
+                340
+            ], 
+            "type": "Sensor", 
+            "uid": "c1a09b9c-83bd-45b7-83a6-5c223bdef555"
+        }, 
+        "c5453050-6e24-438f-92c7-f92b06af6f3b": {
+            "gate_activations": {
+                "gen": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "gen": {
+                    "amplification": 1.0, 
+                    "certainty": 1.0, 
+                    "decay": 0.0, 
+                    "maximum": 2048.0, 
+                    "minimum": -1.0, 
+                    "spreadsheaves": 0.0, 
+                    "threshold": 0.0
+                }
+            }, 
+            "index": 3, 
+            "name": "", 
+            "parameters": {
+                "datasource": "ground"
+            }, 
+            "parent_nodespace": "Root", 
+            "position": [
+                300, 
+                340
+            ], 
+            "type": "Sensor", 
+            "uid": "c5453050-6e24-438f-92c7-f92b06af6f3b"
+        }, 
+        "c8d1a0e0-c0b5-4c33-b2c0-88b6461892b2": {
+            "gate_activations": {
+                "gen": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "gen": {
+                    "amplification": 1.0, 
+                    "certainty": 1.0, 
+                    "decay": 0.0, 
+                    "maximum": 2048.0, 
+                    "minimum": -1.0, 
+                    "spreadsheaves": 0.0, 
+                    "threshold": 0.0
+                }
+            }, 
+            "index": 4, 
+            "name": "", 
+            "parameters": {
+                "datasource": "pos_y"
+            }, 
+            "parent_nodespace": "Root", 
+            "position": [
+                470, 
+                340
+            ], 
+            "type": "Sensor", 
+            "uid": "c8d1a0e0-c0b5-4c33-b2c0-88b6461892b2"
+        }, 
+        "dc27e922-675a-48f2-ab83-60b7f1565f40": {
+            "gate_activations": {
+                "gen": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "gen": {
+                    "amplification": 1.0, 
+                    "certainty": 1.0, 
+                    "decay": 0.0, 
+                    "maximum": 2048.0, 
+                    "minimum": -1.0, 
+                    "spreadsheaves": 0.0, 
+                    "threshold": 0.0
+                }
+            }, 
+            "index": 8, 
+            "name": "", 
+            "parameters": {
+                "datasource": "motive"
+            }, 
+            "parent_nodespace": "Root", 
+            "position": [
+                810, 
+                340
+            ], 
+            "type": "Sensor", 
+            "uid": "dc27e922-675a-48f2-ab83-60b7f1565f40"
+        }, 
+        "e7052e99-7e68-41fb-8788-76060a8ce0d0": {
+            "gate_activations": {
+                "pos_x": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }, 
+                "pos_y": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "pos_x": {
+                    "amplification": 1.0, 
+                    "certainty": 1.0, 
+                    "decay": 0.0, 
+                    "maximum": 2048.0, 
+                    "minimum": 0.0, 
+                    "spreadsheaves": 0.0, 
+                    "threshold": -100.0
+                }, 
+                "pos_y": {
+                    "amplification": 1.0, 
+                    "certainty": 1.0, 
+                    "decay": 0.0, 
+                    "maximum": 2048.0, 
+                    "minimum": 0.0, 
+                    "spreadsheaves": 0.0, 
+                    "threshold": -100.0
+                }
+            }, 
+            "index": 7, 
+            "name": "", 
+            "parameters": {}, 
+            "parent_nodespace": "Root", 
+            "position": [
+                788.75, 
+                148.75
+            ], 
+            "type": "PathPlanning", 
+            "uid": "e7052e99-7e68-41fb-8788-76060a8ce0d0"
+        }, 
+        "f08a96f4-e0ae-48f4-8b5e-91ce9d52d8d5": {
+            "gate_activations": {
+                "gen": {
+                    "default": {
+                        "activation": 0, 
+                        "name": "default", 
+                        "uid": "default"
+                    }
+                }
+            }, 
+            "gate_parameters": {
+                "gen": {
+                    "amplification": 1.0, 
+                    "certainty": 1.0, 
+                    "decay": 0.0, 
+                    "maximum": 2048.0, 
+                    "minimum": -1.0, 
+                    "spreadsheaves": 0.0, 
+                    "threshold": 0.0
+                }
+            }, 
+            "index": 2, 
+            "name": "", 
+            "parameters": {
+                "datasource": "moved"
+            }, 
+            "parent_nodespace": "Root", 
+            "position": [
+                130, 
+                340
+            ], 
+            "type": "Sensor", 
+            "uid": "f08a96f4-e0ae-48f4-8b5e-91ce9d52d8d5"
+        }
+    }, 
+    "nodespaces": {
+        "Root": {
+            "index": 1, 
+            "name": "Root", 
+            "parent_nodespace": null, 
+            "position": [
+                0, 
+                0
+            ], 
+            "uid": "Root"
+        }
+    }, 
+    "owner": "admin", 
+    "step": 0, 
+    "uid": "acccfba8fd4511e38585001f161bc857", 
+    "version": 1, 
+    "world": "a1c8b184fd4511e38585001f161bc857", 
+    "worldadapter": "ThesisAgent"
+}
