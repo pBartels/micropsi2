@@ -18,7 +18,14 @@ class ThesisIsland(Island, World):
 
 
 class ThesisAgent(WorldAdapter):
-    datasources = {'moved': 0, 'pos_x': 0, 'pos_y': 0, 'ground': 0, 'motive': 0}
+    datasources = {'moved': 0,
+                   'pos_x': 0,
+                   'pos_y': 0,
+                   'ground': 0,
+                   'motive': 0,
+                   'energy': 1,
+                   'healthiness': 1,
+                   'exploration': 1}
     datatargets = {'pos_x': 0, 'pos_y': 0}
     last_position = None
     known_positions = []
@@ -81,6 +88,11 @@ class ThesisAgent(WorldAdapter):
 
         if self.position not in self.known_positions:
             self.exploration += 0.01 # exploration tank refills when moving around
+
+        # update datasources
+        self.datasources['energy'] = self.energy
+        self.datasources['healthiness'] = self.healthiness
+        self.datasources['exploration'] = self.exploration
 
     def select_motive(self):
         # it might be useful to put everything in a dict in general?
