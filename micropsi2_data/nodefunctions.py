@@ -1,13 +1,14 @@
 __author__ = 'pBartels'
-__date__ = '26.06.14'
 
-import re, math
+import re, math, random, os
 
 
 def path_planning(netapi, node=None, sheaf='default', **params):
 
     def determine_nearest_waypoint(node, pos_x, pos_y):
-        # get the connected paths to this ground marker
+        """ Returns the waypoint nearest to pos_x, pos_y on the paths leading to the goal given by 'node' """
+
+        # get all connected paths to this ground marker
         sur_paths = [link.target_node for link in node.get_gate('sur').outgoing.values()]
 
         # traverse path and determine nearest waypoint
@@ -20,7 +21,7 @@ def path_planning(netapi, node=None, sheaf='default', **params):
                 match = list(map(int, re.findall(r'\d+', cur_waypoint.name)))
                 distance = math.sqrt((pos_x - match[0]) ** 2 + (pos_y - match[1]) ** 2)
 
-                if distance < 10:
+                if distance < 1:
                     # already next to nearest waypoint, now follow path (in 'por' direction)
                     next_waypoints = [link.target_node for link in cur_waypoint.get_gate('por').outgoing.values()]
                     if next_waypoints:
@@ -40,49 +41,103 @@ def path_planning(netapi, node=None, sheaf='default', **params):
         return nearest_waypoint
 
 
-    # note: the gates of the sensors must be properly parameterized (the maximum must not be 1)
+    def validate_waypoint_leads_to_goal(waypoint_node, goal_node):
+        """ Validates if the waypoint_node leads to the goal_node """
+
+        cur_waypoint = waypoint_node
+        while cur_waypoint:
+            sur_node_names = [link.target_node.name for link in cur_waypoint.get_gate('sub').outgoing.values()]
+            if sur_node_names and goal_node.name in sur_node_names:
+                return True
+
+            cur_waypoint = [link.target_node for link in cur_waypoint.get_gate('por').outgoing.values()]
+            if cur_waypoint:
+                cur_waypoint = cur_waypoint[0]
+
+        return False
+
+
+    def get_nodes_by_name(nodespace, name):
+        """ Returns all nodes in the 'nodespace' with the name given by 'name' """
+        return [n for n in netapi.get_nodes(nodespace.uid) if n.name == name]
+
+
+    # NOTE: the gates of the sensors must be properly parameterized (the maximum must not be 1)
     pos_x = int(node.get_slot('pos_x').get_activation())
     pos_y = int(node.get_slot('pos_y').get_activation())
     motive = int(node.get_slot('motive').get_activation())
+    moved = int(node.get_slot('moved').get_activation())
+    target_x = int(node.get_slot('target_x').get_activation())
+    target_y = int(node.get_slot('target_y').get_activation())
 
-
-    # check if a dedicated nodespace already exists and use this or abort
+    # check if a dedicated nodespace already exists and use this
     path_nodespace = None
     for n in netapi.nodespaces.values():
         if n.name == 'mapping':
             path_nodespace = n
             break
 
-    if not path_nodespace:
-        return
 
+    # calculate a target that fulfills the current demand
+    if path_nodespace and (motive == 0 or motive == 1):
+        # pepare a dict of all nodes in the path nodespace
+        nodes = {n.name:get_nodes_by_name(path_nodespace, n.name) for n in netapi.get_nodes(path_nodespace.uid)}
 
-    # pepare a dict of all nodes in the path nodespace
-    nodes = {n.name:n for n in netapi.get_nodes(path_nodespace.uid)}
+        # TODO: there might be better solutions to encode motives?
+        # motive encoding:
+        # 0. 'energy'
+        # 1. 'healthiness'
+        # 2. 'exploration'
 
+        # determine a goal node that fulfills demand
+        if motive == 0: # 0. 'energy'
+            marker_node = nodes['ground_darkgrass'][0]
+        elif motive == 1: # 1. 'healthiness'
+            marker_node = nodes['ground_grass'][0]
 
-    # TODO: there might be better solutions to encode motives?
-    # motive encoding:
-    # 0. 'energy'
-    # 1. 'healthiness'
-    # 2. 'exploration'
+        # check if current target already leads to an according goal node
+        target_waypoint_name = "waypoint_%s_%s" % (target_x, target_y)
+        waypoint_leads_to_goal = False
+        for n in get_nodes_by_name(path_nodespace, target_waypoint_name):
+            waypoint_leads_to_goal = validate_waypoint_leads_to_goal(n, marker_node)
+            if waypoint_leads_to_goal:
+                break
 
-    # determine nearest waypoint in all paths to area that fulfills demand
-    if motive == 0: # 0. 'energy'
-        marker_node = nodes['ground_darkgrass']
-    elif motive == 1: # 1. 'healthiness'
-        marker_node = nodes['ground_grass']
-    elif motive == 2: # 2. 'exploration'
-        return # nothing to do if motive is exploration
+        # determine nearest waypoint in all paths to area that fulfills demand
+        if not waypoint_leads_to_goal:
+            nearest_waypoint = determine_nearest_waypoint(marker_node, pos_x, pos_y)
+            if nearest_waypoint:
+                match = list(map(int, re.findall(r'\d+', nearest_waypoint.name)))
+                target_x, target_y = match
 
-    nearest_waypoint = determine_nearest_waypoint(marker_node, pos_x, pos_y)
-    if nearest_waypoint:
-        match = list(map(int, re.findall(r'\d+', nearest_waypoint.name)))
-        # set activation on gates to enable locomotion
-        node.get_gate("pos_x").gate_function(match[0])
-        node.get_gate("pos_y").gate_function(match[1])
+    
+    if target_x and target_y and target_x == pos_x and target_y == pos_y:
+        # agent has reached targeted position
+        # reset target
+        target_x, target_y = (0, 0)
 
-    # TODO: do not perform this over and over again...
+    elif target_x and target_y and moved:
+        # agent targets a position but hasn't reached it yet
+        # do not change it, let the agent move towards it
+        pass
+
+    elif not target_x or not target_y or not moved:
+        # agent targets no position at the moment
+        # decide new target (at the moment not based on the motive)
+        # (even if a motive, for example 'energy', would be known, if no target is set, it is not known how to
+        # fulfill it and thus a random movement seems useful)
+
+        # sample a random position on the map
+        random.seed(os.urandom(32))
+        # TODO use proper world dimensions
+        while True:
+            target_x, target_y = (random.randint(0, 799), random.randint(0, 799))
+            if netapi.world.get_ground_at(target_x, target_y) != 7: # validate target is not on water
+                break
+
+    # set activation on gates to enable locomotion
+    node.get_gate("target_x").gate_function(target_x)
+    node.get_gate("target_y").gate_function(target_y)
 
 
 def mapping(netapi, node=None, sheaf='default', **params):
@@ -216,25 +271,25 @@ def mapping(netapi, node=None, sheaf='default', **params):
     else:
         ground_grass = nodes['ground_grass']
 
-
     # attach the path to a ground_type / area if not already a nearby waypoint is linked
     # TODO: the agent should also remember world borders?!
-    ground = int(node.get_slot('ground').get_activation())
-    if ground == 3:
+    perceived_ground = int(node.get_slot('ground').get_activation())
+    if perceived_ground == 3:
         ground_node = ground_darkgrass
-    elif ground == 2:
+    elif perceived_ground == 2:
         ground_node = ground_swamp
-    elif ground == 0:
+    elif perceived_ground == 0:
         ground_node = ground_grass
     else:
         ground_node = None
 
-    if ground_node and not get_waypoints_in_range(ground_node, pos_x, pos_y, 15):
+    ground_at = netapi.world.get_ground_at(pos_x, pos_y)
+    if ground_node and perceived_ground == ground_at and not get_waypoints_in_range(ground_node, pos_x, pos_y, 3):
         netapi.link(waypoint, 'sub', ground_node, 'gen')
         netapi.link(ground_node, 'sur', waypoint, 'gen')
         netapi.unlink(last_waypoint, 'sub', waypoint, 'gen') # unlink the waypoint marker
 
-        if ground == 2:
+        if perceived_ground == 2:
             remove_preceding_waypoints(waypoint)
 
 
@@ -250,3 +305,7 @@ def mapping(netapi, node=None, sheaf='default', **params):
     # TODO if a demand was very high when it is fulfilled, the path should be stored as longer?
 
     # TODO waypoint optimization
+
+    # TODO if the agent leaves an area it could also remember the way back to it
+
+    # TODO do not add two times the same waypoint one after another

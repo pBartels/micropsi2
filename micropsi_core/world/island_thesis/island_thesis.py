@@ -35,7 +35,7 @@ class ThesisAgent(WorldAdapter):
         if not "position" in data:
             self.position = self.world.groundmap['start_position']
             self.last_position = self.position
-            self.known_positions.append(self.last_position)
+            self.known_positions.append(self.position)
 
             self.datatargets['pos_x'] = 0
             self.datatargets['pos_y'] = 0
@@ -48,42 +48,15 @@ class ThesisAgent(WorldAdapter):
             self.select_motive() # also sets datasource
 
     def perceive_ground(self):
-        return self.world.get_ground_at(self.position[0], self.position[1])
+        return self.world.get_ground_at(self.datasources['pos_x'], self.datasources['pos_y'])
 
     def update(self):
         """called on every world simulation step to advance the life of the agent"""
-
-        target_pos_x = int(self.datatargets['pos_x'])
-        target_pos_y = int(self.datatargets['pos_y'])
-        self.set_datatarget_feedback('pos_x', target_pos_x)
-        self.set_datatarget_feedback('pos_y', target_pos_y)
-
-        # TODO: improve movement behavior
-        if not target_pos_x and not target_pos_y:
-            # a very simple random movement to check how a position update cycle works
-            random.seed(os.urandom(32))
-            newpos = (self.position[0]+random.randint(-5, 5), self.position[1]+random.randint(-5, 20))
-        else:
-            # locomote to desired position
-            newpos = (target_pos_x, target_pos_y)
-
-        # use water as a border and respect motives
-        motive = self.select_motive()
-        if self.world.get_ground_at(newpos[0], newpos[1]) != 7 and motive == 'exploration' or motive == 'energy':
-            self.known_positions.append(self.last_position)
-            self.last_position = self.position
-            self.position = newpos
-            self.datasources['moved'] = 1
-            self.datasources['pos_x'] = newpos[0]
-            self.datasources['pos_y'] = newpos[1]
-        else:
-            self.datasources['moved'] = 0
-            self.datasources['pos_x'] = self.position[0]
-            self.datasources['pos_y'] = self.position[1]
+        self.locomote()
+        self.update_tanks()
 
         self.datasources['ground'] = self.perceive_ground()
 
-        self.update_tanks()
         self.observe()
 
     def update_tanks(self):
@@ -119,9 +92,53 @@ class ThesisAgent(WorldAdapter):
         self.datasources['motive'] = list(tanks.keys()).index(motive)
         return motive
 
+    def locomote(self):
+        target_pos_x = int(self.datatargets['pos_x'])
+        target_pos_y = int(self.datatargets['pos_y'])
+        self.set_datatarget_feedback('pos_x', target_pos_x)
+        self.set_datatarget_feedback('pos_y', target_pos_y)
+
+        if target_pos_x and target_pos_y and (self.position[0] != target_pos_x or self.position[1] != target_pos_y):
+            # move towards target
+            diff_x = max(min(5, target_pos_x - self.position[0]), -5)
+            diff_y = max(min(5, target_pos_y - self.position[1]), -5)
+            newpos_x = int(self.position[0] + diff_x)
+            newpos_y = int(self.position[1] + diff_y)
+
+            # validate new position is not on water or sample new local position around it if so
+            random.seed(os.urandom(32))
+            newpos_x_s = newpos_x
+            newpos_y_s = newpos_y
+            iterations = 0
+            while self.world.get_ground_at(newpos_x_s, newpos_y_s) == 7:
+                iterations += 1
+                newpos_x_s = int(newpos_x + random.randint(-10, 10))
+                newpos_y_s = int(newpos_y + random.randint(-10, 10))
+
+                if iterations >= 4:
+                    self.datasources['moved'] = 0 # leads to sampling of new target
+                    return
+
+            # update position
+            self.last_position = self.position
+            self.position = (newpos_x_s, newpos_y_s)
+            self.known_positions.append(self.position)
+            self.datasources['moved'] = 1
+        else:
+            self.datasources['moved'] = 0
+
+        self.datasources['pos_x'] = self.position[0]
+        self.datasources['pos_y'] = self.position[1]
+
     def observe(self):
         print('Ground:', ground_types[self.perceive_ground()]['type'])
         print('Energy:', self.energy)
         print('Healthiness:', self.healthiness)
         print('Exploration:', self.exploration)
-        print('Motive:', self.select_motive(), '\n')
+        print('Motive:', self.select_motive())
+
+        print('Position:', self.position[0], self.position[1])
+        print('Target:', self.datatargets['pos_x'], self.datatargets['pos_y'])
+        print('Moved:', bool(self.datasources['moved']))
+
+        print('\n')

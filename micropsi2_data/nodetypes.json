@@ -8,16 +8,16 @@
     },
     "PathPlanning": {
         "name": "PathPlanning",
-        "slottypes": ["pos_x", "pos_y", "motive"],
+        "slottypes": ["pos_x", "pos_y", "motive", "moved", "target_x", "target_y"],
         "nodefunction_name": "path_planning",
-        "gatetypes": ["pos_x", "pos_y"],
+        "gatetypes": ["target_x", "target_y"],
         "gate_defaults": {
-            "pos_x": {
+            "target_x": {
                 "minimum": 0,
                 "maximum": 2048,
                 "threshold": -100
             },
-            "pos_y": {
+            "target_y": {
                 "minimum": 0,
                 "maximum": 2048,
                 "threshold": -100
