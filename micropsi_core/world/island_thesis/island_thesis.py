@@ -154,3 +154,6 @@ class ThesisAgent(WorldAdapter):
         print('Moved:', bool(self.datasources['moved']))
 
         print('\n')
+
+    def is_alive(self):
+        return self.datasources["energy"] > 0 and self.datasources["healthiness"] > 0
