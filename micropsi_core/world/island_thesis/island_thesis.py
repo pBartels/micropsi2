@@ -1,7 +1,11 @@
+import micropsi_core
+from micropsi_core import tools
 from micropsi_core.world.island.island import *
-import random, collections
+import random, collections, os
 
 class ThesisIsland(Island, World):
+    agent_amount = 0
+
     def __init__(self, filename, world_type="ThesisIsland", name="", owner="", uid=None, version=1):
 
         self.assets['background'] = "island/psi_emo.png"
@@ -15,6 +19,59 @@ class ThesisIsland(Island, World):
 
         # delegate constructor call to parent class
         super().__init__(filename, world_type, name, owner, uid, version)
+
+    def step(self):
+        # delegate method call to parent class
+        super().step()
+
+        # spawn new agents every 250 steps
+        if not self.current_step % 50 or (not self.agents and self.current_step == 1):
+            # search template nodenet
+            nodenets = micropsi_core.runtime.get_available_nodenets()
+            template_nodenet_uid = None
+            for uid in nodenets:
+                if nodenets[uid]['name'] == 'TemplateNodeNet':
+                    template_nodenet_uid = uid
+
+            if not template_nodenet_uid:
+                return # TODO raise error
+
+            # ensure nodenet was loaded
+            micropsi_core.runtime.load_nodenet(template_nodenet_uid)
+
+            # create new nodenet
+            nodenet_name = "Agent %s" % (self.agent_amount + 1)
+            success, nodenet_uid = micropsi_core.runtime.new_nodenet(nodenet_name = nodenet_name,
+                                                                     worldadapter = 'ThesisAgent',
+                                                                     template = template_nodenet_uid,
+                                                                     owner = self.owner,
+                                                                     world_uid = self.uid,
+                                                                     uid = tools.generate_uid())
+
+            # spawn agent
+            if success:
+                self.spawn_agent('ThesisAgent', nodenet_uid)
+                self.agents[nodenet_uid].name = nodenet_name
+                self.agents[nodenet_uid].position = self.sample_position()
+                self.agent_amount += 1
+
+                # start the new nodenet
+                micropsi_core.runtime.load_nodenet(nodenet_uid)
+                micropsi_core.runtime.start_nodenetrunner(nodenet_uid)
+            else:
+                return # TODO raise error
+
+
+    def sample_position(self):
+        # sample a random position on the map
+        random.seed(os.urandom(32))
+        # TODO use proper world dimensions
+        while True:
+            x, y = (random.randint(0, 799), random.randint(0, 799))
+            if self.get_ground_at(x, y) != 7: # validate target is not on water
+                break
+
+        return x, y
 
 
 class ThesisAgent(WorldAdapter):

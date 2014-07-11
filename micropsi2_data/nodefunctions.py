@@ -128,12 +128,7 @@ def path_planning(netapi, node=None, sheaf='default', **params):
         # fulfill it and thus a random movement seems useful)
 
         # sample a random position on the map
-        random.seed(os.urandom(32))
-        # TODO use proper world dimensions
-        while True:
-            target_x, target_y = (random.randint(0, 799), random.randint(0, 799))
-            if netapi.world.get_ground_at(target_x, target_y) != 7: # validate target is not on water
-                break
+        target_x, target_y = netapi.world.sample_position()
 
     # set activation on gates to enable locomotion
     node.get_gate("target_x").gate_function(target_x)
