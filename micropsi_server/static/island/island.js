@@ -136,6 +136,7 @@ refreshWorldView = function(){
 
             updateSceneViewer();
             updateViewSize();
+            refreshNodenetList(); // in case new nodenets were created on the serverside
             if(worldRunning){
                 refreshWorldView();
             }
